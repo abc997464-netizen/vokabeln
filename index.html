@@ -118,13 +118,13 @@ function vAdd(){
 async function shrink(f){const b=await createImageBitmap(f),k=Math.min(1,1600/Math.max(b.width,b.height)),c=document.createElement("canvas");c.width=b.width*k;c.height=b.height*k;c.getContext("2d").drawImage(b,0,0,c.width,c.height);return new Promise(r=>c.toBlob(r,"image/jpeg",.85))}
 async function pick(f){
  if(!f)return;const dn=$("#dn").value.trim();BUSY=true;ERR="";A=dn;render();
- try{let code=localStorage.getItem("cc");if(!code){code=prompt("Klassen-Code eingeben");if(!code)throw 0;localStorage.setItem("cc",code)}
+ try{let code=localStorage.getItem("cc");if(!code){code=prompt("Klassen-Code eingeben");if(!code)throw 3;localStorage.setItem("cc",code)}
   const blob=await shrink(f),img=await new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(",")[1]);x.readAsDataURL(blob)});
   const res=await fetch("/.netlify/functions/extract",{method:"POST",body:JSON.stringify({image:img,code})});
-  if(res.status==401){localStorage.removeItem("cc");throw 2}if(!res.ok)throw 0;
+  if(res.status==401){localStorage.removeItem("cc");throw 2}if(!res.ok)throw{s:res.status,t:(await res.text()).slice(0,160)};
   const m=(await res.text()).match(/\[[\s\S]*\]/),rows=JSON.parse(m[0]).filter(r=>r&&r.f&&r.b).map(r=>({f:String(r.f),b:String(r.b)}));if(!rows.length)throw 1;
   R={dn,rows};BUSY=false;go('review')}
- catch(e){BUSY=false;ERR=e===1?"Ich konnte keine Vokabeln erkennen. Fotografiere näher und gerade, oder tippe sie ein.":e===2?"Der Klassen-Code stimmt nicht.":"Die Foto-Erkennung klappt gerade nicht. Du kannst die Karten auch eintippen.";render()}}
+ catch(e){BUSY=false;ERR=e===1?"Ich konnte keine Vokabeln erkennen. Fotografiere näher und gerade, oder tippe sie ein.":e===2?"Der Klassen-Code stimmt nicht.":e===3?"Ohne Klassen-Code geht es nicht.":e&&e.s?"Fehler "+e.s+": "+e.t:"Keine Verbindung zur Funktion ("+(e&&e.message||e)+"). Wurde die Funktion mit deployt?";render()}}
 function manual(){R={dn:$("#dn").value.trim(),rows:[{f:"",b:""},{f:"",b:""},{f:"",b:""}]};go('review')}
 
 function vReview(){
