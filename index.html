@@ -53,6 +53,10 @@ nav{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .xp{position:fixed;left:50%;top:38%;transform:translateX(-50%);font:700 30px -apple-system,system-ui,sans-serif;color:var(--green);animation:up 1.3s ease-out forwards;pointer-events:none;z-index:9;white-space:nowrap}
 .qcard.bad{animation:shake .45s}.qcard.good{animation:bump .4s}
 @keyframes grow{from{transform:scaleY(0)}}@keyframes bump{50%{transform:scale(1.04)}}@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}@keyframes up{to{transform:translate(-50%,-90px);opacity:0}}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:grid;place-items:center;padding:20px;z-index:20;animation:fade .25s}
+.sheet{background:var(--card);border-radius:28px;padding:28px 22px 16px;width:100%;max-width:340px;text-align:center;animation:popin .35s cubic-bezier(.2,.9,.3,1.2)}
+.sheet .ic{font-size:46px}.sheet h2{font-size:24px;margin:8px 0 4px}.sheet .in{text-align:center;font-size:24px;letter-spacing:.3em;margin:16px 0 4px}
+@keyframes fade{from{opacity:0}}@keyframes popin{from{transform:scale(.88);opacity:0}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style></head><body><div id="app"></div>
 <script>
@@ -75,8 +79,10 @@ const Store={
   if(dbRef)dbRef.set(JSON.parse(JSON.stringify(S))).catch(()=>{})}
 };
 
-const norm=s=>s.toLowerCase().normalize("NFC").replace(/\(.*?\)/g,"").replace(/[^\p{L}\p{N} ]/gu,"").replace(/\s+/g," ").trim().replace(/^(to|the|a|an) /,"");
+const SYN={smth:"sth",smthg:"sth",something:"sth",smb:"sb",smbd:"sb",sby:"sb",somebody:"sb",someone:"sb",jmdn:"jdn",jemanden:"jdn",jmdm:"jdm",jemandem:"jdm",etwas:"etw"};
+const norm=s=>s.toLowerCase().normalize("NFC").replace(/\(.*?\)/g," ").replace(/['’‘´`]/g,"").replace(/[^\p{L}\p{N} ]/gu," ").split(/\s+/).filter(Boolean).map(w=>SYN[w]||w).join(" ").replace(/^(to|the|a|an) /,"");
 function lev(a,b){const m=[...Array(b.length+1).keys()];for(let i=1;i<=a.length;i++){let p=m[0];m[0]=i;for(let j=1;j<=b.length;j++){const t=m[j];m[j]=Math.min(m[j]+1,m[j-1]+1,p+(a[i-1]==b[j-1]?0:1));p=t}}return m[b.length]}
+const ex=s=>s.toLowerCase().normalize("NFC").replace(/[’‘´`]/g,"'").replace(/\s+/g," ").trim();
 const shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
 const due=c=>c.due<=today(),deckName=id=>(S.decks.find(d=>d.id==id)||{}).n||"";
 const streak=()=>(S.last==today()||S.last==addDays(-1))?S.streak:0;
@@ -118,10 +124,10 @@ function vAdd(){
 async function shrink(f){const b=await createImageBitmap(f),k=Math.min(1,1600/Math.max(b.width,b.height)),c=document.createElement("canvas");c.width=b.width*k;c.height=b.height*k;c.getContext("2d").drawImage(b,0,0,c.width,c.height);return new Promise(r=>c.toBlob(r,"image/jpeg",.85))}
 async function pick(f){
  if(!f)return;const dn=$("#dn").value.trim();BUSY=true;ERR="";A=dn;render();
- try{let code=localStorage.getItem("cc");if(!code){code=prompt("Klassen-Code eingeben");if(!code)throw 3;localStorage.setItem("cc",code)}
+ try{let code=localStorage.getItem("cc");if(!code){code=await codeSheet(CW);CW=false;if(!code)throw 3;localStorage.setItem("cc",code)}
   const blob=await shrink(f),img=await new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(",")[1]);x.readAsDataURL(blob)});
   const res=await fetch("/.netlify/functions/extract",{method:"POST",body:JSON.stringify({image:img,code})});
-  if(res.status==401){localStorage.removeItem("cc");throw 2}if(!res.ok)throw{s:res.status,t:(await res.text()).slice(0,160)};
+  if(res.status==401){localStorage.removeItem("cc");CW=true;throw 2}if(!res.ok)throw{s:res.status,t:(await res.text()).slice(0,160)};
   const m=(await res.text()).match(/\[[\s\S]*\]/),rows=JSON.parse(m[0]).filter(r=>r&&r.f&&r.b).map(r=>({f:String(r.f),b:String(r.b)}));if(!rows.length)throw 1;
   R={dn,rows};BUSY=false;go('review')}
  catch(e){BUSY=false;ERR=e===1?"Ich konnte keine Vokabeln erkennen. Fotografiere näher und gerade, oder tippe sie ein.":e===2?"Der Klassen-Code stimmt nicht.":e===3?"Ohne Klassen-Code geht es nicht.":e&&e.s?"Fehler "+e.s+": "+e.t:"Keine Verbindung zur Funktion ("+(e&&e.message||e)+"). Wurde die Funktion mit deployt?";render()}}
@@ -146,7 +152,7 @@ function start(items){if(!items.length)return;
 function startAll(){const d=dueAll();start(d.length?d:allOf(S.decks))}
 function startDeck(id){const k=S.decks.find(x=>x.id==id),d=k.cards.filter(due).map(c=>({d:id,c}));start(d.length?d:allOf([k]))}
 const Q=()=>{const it=L.q[L.i],c=it.c;return{it,c,q:L.swap?c.b:c.f,a:L.swap?c.f:c.b}};
-function hintText(a,h){return [...a.split(/[;\/]/)[0].trim()].map((ch,i)=>i<h?ch:ch==" "?" ":"•").join("")}
+function hintText(a,h){return [...a.split(";")[0].trim()].map((ch,i)=>i<h?ch:ch==" "?" ":"•").join("")}
 function vLearn(){
  const{it,q,a}=Q(),ask=L.st=="ask";
  return `<nav><button class="lnk" onclick="L=null;go('home')">✕</button><div class="bar grow"><i style="width:${L.i/L.q.length*100}%"></i></div><button class="lnk" onclick="L.swap=!L.swap;L.t='';render()" aria-label="Richtung tauschen">⇄</button></nav>
@@ -156,12 +162,12 @@ function vLearn(){
  ${ask?`<input id="ans" class="in" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Deine Antwort" onkeydown="if(event.key=='Enter')check()">
  <div class="btns"><button class="ghost" onclick="hint()">💡 Hinweis</button><button class="ghost" onclick="settle(false,'Aufgelöst:')">Auflösen</button></div><button class="big" onclick="check()">Prüfen</button>`
  :`<p class="fbk">${esc(L.fb.msg)}</p><p class="ans">${esc(a)}</p><button class="big" onclick="next()">Weiter</button>`}</div>`}
-function hint(){const{a}=Q(),n=a.split(/[;\/]/)[0].trim().length;L.t=$("#ans").value;if(L.h<n)L.h++;render()}
+function hint(){const{a}=Q(),n=a.split(";")[0].trim().length;L.t=$("#ans").value;if(L.h<n)L.h++;render()}
 function check(){
  const{a}=Q(),v=$("#ans").value;if(!v.trim())return;
- const alts=a.split(/[;\/]/).map(norm).filter(Boolean),n=norm(v);
- if(alts.includes(n))settle(true,L.h?"Richtig, mit Hinweis":["Richtig!","Stark!","Genau!","Perfekt!"][L.combo%4]);
- else if(alts.some(x=>x.length>=5&&lev(x,n)<=1))settle(true,"Fast, nur ein kleiner Tippfehler. Zählt!");
+ const alts=[...a.split(/[;,]/),a].map(norm).filter(Boolean),n=norm(v),sp=t=>t.replace(/ /g,""),m=p=>alts.some(x=>x==p||sp(x)==sp(p)),f=p=>alts.some(x=>x.length>=5&&lev(x,p)<=(x.length>=9?2:1)),ps=v.split(/[;,]/).map(norm).filter(Boolean);
+ if(m(n)||ps.length>1&&ps.every(m))settle(true,L.h?"Richtig, mit Hinweis":["Richtig!","Stark!","Genau!","Perfekt!"][L.combo%4]);
+ else if(f(n)||ps.length>1&&ps.every(p=>m(p)||f(p)))settle(true,"Fast, nur ein kleiner Tippfehler. Zählt!");
  else settle(false,"Leider falsch. Richtig ist:")}
 function settle(ok,msg){
  const{it,c}=Q(),hint=L.h>0;let gain=0;
@@ -187,7 +193,7 @@ const lvl=()=>{const x=S.xp||0,n=Math.floor(Math.sqrt(x/40))+1,a=40*(n-1)**2,b=4
 const dayName=k=>new Date(k+"T12:00").toLocaleDateString("de",{weekday:"short"}).slice(0,2);
 const weekDots=()=>[6,5,4,3,2,1,0].map(n=>{const k=addDays(-n),on=(S.days[k]||0)>0;return `<span><i class="${on?"on":""}">${on?"✓":""}</i>${dayName(k)}</span>`}).join("");
 function toast(t,top){const s=document.createElement("div");s.className="xp";if(top)s.style.top=top;s.textContent=t;document.body.appendChild(s);setTimeout(()=>s.remove(),1400)}
-function perms(){const c=prompt("Klassen-Code eingeben");if(c){localStorage.setItem("cc",c);ERR="";render()}}
+async function perms(){const c=await codeSheet(false);if(c){localStorage.setItem("cc",c);ERR="";render()}}
 function vStats(){
  const cs=allOf(S.decks),m=cs.filter(x=>x.c.box>=4).length,a=S.acc||{ok:0,tot:0},days=[6,5,4,3,2,1,0].map(addDays),mx=Math.max(GOAL,...days.map(k=>S.days[k]||0)),l=lvl();
  const B=[["🔥","3 Tage Streak",streak()>=3],["🌟","7 Tage Streak",streak()>=7],["📚","25 Karten",cs.length>=25],["🧠","10 gemeistert",m>=10],["🎯","Perfekte Runde",(S.perf||0)>0],["⚡","500 XP",S.xp>=500],["🏆","Level 5",l.n>=5],["💪","100 Antworten",a.tot>=100]];
@@ -197,5 +203,10 @@ function vStats(){
  <div class="card"><b>Letzte 7 Tage</b><div class="bars" style="margin-top:12px">${days.map(k=>{const v=S.days[k]||0;return `<div><span>${v||""}</span><i style="height:${Math.max(5,v/mx*85)}px"></i>${dayName(k)}</div>`}).join("")}</div></div>
  <h3>Abzeichen</h3><div class="badges">${B.map(b=>`<div class="bd ${b[2]?"":"off"}"><span>${b[0]}</span>${b[1]}</div>`).join("")}</div>
  <button class="ghost" style="width:100%;margin-top:18px" onclick="perms()">🔑 Klassen-Code ändern</button>`}
+let CW=false;
+function codeSheet(wrong){return new Promise(res=>{const o=document.createElement("div");o.className="ov";
+ o.innerHTML=`<div class="sheet"><div class="ic">🔑</div><h2>Klassen-Code</h2><p class="sub">${wrong?'<span style="color:var(--red)">Der Code stimmt nicht. Versuch es noch einmal.</span>':"Den bekommst du von deiner Klasse. Er schützt die Foto-Erkennung."}</p><input class="in" id="cc" type="password" autocomplete="off" placeholder="••••"><button class="big" id="ccok">Weiter</button><button class="lnk" id="ccno">Abbrechen</button></div>`;
+ document.body.appendChild(o);const i=o.querySelector("#cc"),d=v=>{o.remove();res(v)};i.focus();
+ o.querySelector("#ccok").onclick=()=>d(i.value.trim());o.querySelector("#ccno").onclick=()=>d("");i.onkeydown=e=>{if(e.key=="Enter")d(i.value.trim())}})}
 render();Store.load().then(()=>{ready=true;render()});
 </script></body></html>
