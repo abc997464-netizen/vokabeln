@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<title>Vokabeln</title>
+<style>
+:root{--bg:#f2f2f7;--card:#fff;--tx:#1c1c1e;--tx2:#8e8e93;--blue:#0a84ff;--green:#30d158;--red:#ff453a;--orange:#ff9f0a;--sep:rgba(60,60,67,.14);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--card:#1c1c1e;--tx:#fff;--tx2:#98989f;--sep:rgba(84,84,88,.55);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#000;--card:#1c1c1e;--tx:#fff;--tx2:#98989f;--sep:rgba(84,84,88,.55);color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);font:17px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+#app{max-width:560px;margin:0 auto;padding:12px 16px 120px;animation:in .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+h1{font:700 34px/1.1 -apple-system,"SF Pro Display",system-ui,sans-serif;letter-spacing:-.02em;margin:2px 0 14px}
+h2{font:700 28px/1.2 -apple-system,"SF Pro Display",system-ui,sans-serif;letter-spacing:-.015em;margin:6px 0}
+h3{font-size:22px;margin:26px 4px 10px;letter-spacing:-.01em}
+p{margin:0}.sub{color:var(--tx2);font-size:15px}.err{color:var(--red);margin:12px 4px}
+header{display:flex;justify-content:space-between;align-items:flex-start;padding-top:8px}
+.pill{background:var(--card);border-radius:99px;padding:8px 14px;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card{background:var(--card);border-radius:20px;padding:16px;margin-bottom:12px}
+.hero{display:flex;gap:18px;align-items:center}
+.ringbox{position:relative;width:84px;height:84px;flex:none}.ringbox b{position:absolute;inset:0;display:grid;place-items:center;font-size:26px}
+.big{display:block;width:100%;border:0;border-radius:16px;background:var(--blue);color:#fff;font:600 17px/1 inherit;font-family:inherit;padding:17px;margin:12px 0;text-align:center;cursor:pointer;transition:transform .15s,opacity .2s}
+.big:active{transform:scale(.97)}.big:disabled{opacity:.45}
+.ghost{border:0;border-radius:14px;background:var(--card);color:var(--blue);font:600 16px inherit;font-family:inherit;padding:14px 16px;cursor:pointer;flex:1}
+.lnk{border:0;background:none;color:var(--blue);font:17px inherit;font-family:inherit;padding:8px 4px;cursor:pointer}
+.row{display:flex;align-items:center;gap:12px;background:var(--card);padding:14px 16px;border-radius:16px;margin-bottom:8px;cursor:pointer;transition:transform .15s}
+.row:active{transform:scale(.98)}.row .em{font-size:28px}.grow{flex:1;min-width:0}.chev{color:var(--tx2);font-size:22px}
+.bar{height:6px;background:var(--sep);border-radius:9px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:var(--green);border-radius:9px;transition:width .5s}
+nav{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.in{width:100%;border:0;background:var(--bg);color:var(--tx);border-radius:12px;padding:13px 14px;font:17px inherit;font-family:inherit;outline:none;margin-top:6px}
+.in:focus{box-shadow:0 0 0 3px rgba(10,132,255,.35)}
+.fab{position:fixed;right:20px;bottom:calc(22px + env(safe-area-inset-bottom,0px));width:60px;height:60px;border-radius:50%;border:0;background:var(--blue);color:#fff;font-size:32px;box-shadow:0 8px 24px rgba(10,132,255,.45);cursor:pointer}
+.file{cursor:pointer}.center{text-align:center;padding:30px 16px;display:grid;gap:12px;place-items:center}
+.spin{width:34px;height:34px;border-radius:50%;border:4px solid var(--sep);border-top-color:var(--blue);animation:sp .8s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+.qcard{background:var(--card);border-radius:26px;padding:24px 20px;margin-top:14px;text-align:center;transition:background .3s,box-shadow .3s}
+.qcard h2{font-size:34px;margin:14px 0 18px;word-break:break-word}
+.qcard.good{box-shadow:inset 0 0 0 3px var(--green)}.qcard.bad{box-shadow:inset 0 0 0 3px var(--red)}
+.qcard .in{text-align:center;font-size:20px}.btns{display:flex;gap:10px;margin-top:12px}
+.hint{letter-spacing:.2em;font:600 22px ui-monospace,Menlo,monospace;color:var(--orange);margin-bottom:12px}
+.fbk{font-weight:600}.ans{font:700 30px -apple-system,system-ui,sans-serif;margin:8px 0 4px}
+.combo{text-align:center;color:var(--orange);font-weight:700;margin-top:10px;animation:in .3s}
+.mini{display:flex;gap:8px;align-items:center}.mini .in{margin:0}.x{border:0;background:none;color:var(--tx2);font-size:20px;cursor:pointer;padding:6px}
+.cf{position:fixed;top:-30px;animation:fall 1.9s ease-in forwards;pointer-events:none;z-index:9}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:0}}
+.score{position:relative;width:150px;height:150px;margin:10px auto}.score b{position:absolute;inset:0;display:grid;place-items:center;font-size:38px}
+.hero{flex-wrap:wrap}.lv{width:100%}.lv .bar{height:8px;margin:0}
+.week{display:flex;justify-content:space-between;width:100%}.week span{text-align:center;font-size:12px;color:var(--tx2)}.week i{width:28px;height:28px;border-radius:50%;background:var(--sep);margin:0 auto 3px;display:grid;place-items:center;font-style:normal;font-size:14px;color:#fff}.week i.on{background:var(--green);animation:bump .5s}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.stat{background:var(--card);border-radius:16px;padding:14px 6px;text-align:center;font-size:13px;color:var(--tx2)}.stat b{display:block;font:700 28px -apple-system,system-ui,sans-serif;color:var(--tx)}
+.bars{display:flex;align-items:flex-end;gap:8px;height:130px}.bars div{flex:1;text-align:center;font-size:12px;color:var(--tx2);display:flex;flex-direction:column;justify-content:flex-end;height:100%}.bars i{display:block;background:var(--blue);border-radius:8px 8px 4px 4px;margin-bottom:4px;transform-origin:bottom;animation:grow .8s cubic-bezier(.2,.8,.2,1) both}
+.badges{display:grid;grid-template-columns:1fr 1fr;gap:8px}.bd{background:var(--card);border-radius:16px;padding:12px;display:flex;gap:10px;align-items:center;font-size:15px}.bd.off{opacity:.35;filter:grayscale(1)}.bd span{font-size:28px}
+.xp{position:fixed;left:50%;top:38%;transform:translateX(-50%);font:700 30px -apple-system,system-ui,sans-serif;color:var(--green);animation:up 1.3s ease-out forwards;pointer-events:none;z-index:9;white-space:nowrap}
+.qcard.bad{animation:shake .45s}.qcard.good{animation:bump .4s}
+@keyframes grow{from{transform:scaleY(0)}}@keyframes bump{50%{transform:scale(1.04)}}@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}@keyframes up{to{transform:translate(-50%,-90px);opacity:0}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><div id="app"></div>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9);
+const ld=d=>new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const today=()=>ld(new Date()),addDays=n=>{const d=new Date();d.setDate(d.getDate()+n);return ld(d)};
+const IV=[0,1,2,4,8,16,32],GOAL=20,EMO=["📘","🇬🇧","🇫🇷","🇪🇸","🧬","🧮","🏛️","🌍"];
+const PROMPT='Das Foto zeigt eine Vokabelliste aus einem Schulbuch oder Heft. Lies alle Vokabelpaare. Antworte NUR mit einem JSON-Array: [{"f":"Begriff in der Fremdsprache","b":"deutsche Bedeutung"}]. Mehrere Bedeutungen trennst du mit Semikolon. Ignoriere Überschriften, Seitenzahlen und Beispielsätze. Ist kein Vokabeltext erkennbar, antworte mit [].';
+let S={decks:[],xp:0,streak:0,last:"",days:{}},V="home",A=null,L=null,R=null,X=null,BUSY=false,ERR="",ready=false,dbRef=null;
+
+/* === SPEICHER-SCHICHT: nur hier ändern, wenn später Supabase genutzt wird ===
+   load() liest den ganzen Stand S, save() schreibt ihn. Hier: Claude-Konto (db), sonst localStorage. */
+const Store={
+ async load(){
+  try{if(window.claude){const[u,d]=await Promise.all([claude.use("user"),claude.use("db")]);
+   if(u&&d){dbRef=d.collection("data/users/"+await u.id()).doc("lib");const s=await dbRef.get();if(s.exists)S=Object.assign(S,s.data());return}}}catch(e){}
+  try{const t=localStorage.getItem("vk");if(t)S=Object.assign(S,JSON.parse(t))}catch(e){}},
+ save(){try{localStorage.setItem("vk",JSON.stringify(S))}catch(e){}
+  if(dbRef)dbRef.set(JSON.parse(JSON.stringify(S))).catch(()=>{})}
+};
+
+const norm=s=>s.toLowerCase().normalize("NFC").replace(/\(.*?\)/g,"").replace(/[^\p{L}\p{N} ]/gu,"").replace(/\s+/g," ").trim().replace(/^(to|the|a|an) /,"");
+function lev(a,b){const m=[...Array(b.length+1).keys()];for(let i=1;i<=a.length;i++){let p=m[0];m[0]=i;for(let j=1;j<=b.length;j++){const t=m[j];m[j]=Math.min(m[j]+1,m[j-1]+1,p+(a[i-1]==b[j-1]?0:1));p=t}}return m[b.length]}
+const shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+const due=c=>c.due<=today(),deckName=id=>(S.decks.find(d=>d.id==id)||{}).n||"";
+const streak=()=>(S.last==today()||S.last==addDays(-1))?S.streak:0;
+const dueAll=()=>S.decks.flatMap(d=>d.cards.filter(due).map(c=>({d:d.id,c})));
+const allOf=ds=>ds.flatMap(d=>d.cards.map(c=>({d:d.id,c})));
+function ring(p,s=84,w=9){const r=(s-w)/2,c=2*Math.PI*r,h=s/2;return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}"><circle cx="${h}" cy="${h}" r="${r}" fill="none" stroke="var(--sep)" stroke-width="${w}"/><circle cx="${h}" cy="${h}" r="${r}" fill="none" stroke="var(--blue)" stroke-width="${w}" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-p)}" transform="rotate(-90 ${h} ${h})" style="transition:stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1)"/></svg>`}
+function pop(n=18){for(let i=0;i<n;i++){const s=document.createElement("span");s.className="cf";s.textContent=["🎉","✨","⭐","💙"][i%4];s.style.cssText=`left:${Math.random()*100}vw;animation-delay:${Math.random()*.4}s;font-size:${16+Math.random()*16}px`;document.body.appendChild(s);setTimeout(()=>s.remove(),2400)}}
+const buzz=n=>{try{navigator.vibrate&&navigator.vibrate(n)}catch(e){}};
+
+function go(v,a){V=v;A=a??null;X=null;render();scrollTo(0,0)}
+function render(){
+ $("#app").innerHTML=!ready?'<div class="center"><div class="spin"></div></div>':({home:vHome,deck:vDeck,add:vAdd,review:vReview,learn:vLearn,done:vDone,stats:vStats}[V])();
+ if(V=="learn"){const i=$("#ans");if(i){i.value=L.t||"";i.focus()}}}
+
+function vHome(){
+ const dc=dueAll().length,td=S.days[today()]||0,h=new Date().getHours(),g=h<11?"Guten Morgen":h<18?"Hallo":"Guten Abend",tot=allOf(S.decks).length;
+ return `<header><div><p class="sub">${g}</p><h1>Vokabeln</h1></div><div class="pill" style="cursor:pointer" onclick="go('stats')">🔥 ${streak()} · Lv ${lvl().n}</div></header>
+ <section class="card hero"><div class="ringbox">${ring(Math.min(1,td/GOAL))}<b>${td}</b></div><div><h2>Heute</h2><p class="sub">${td} von ${GOAL} Karten<br>Level ${lvl().n} · ${S.xp} XP</p></div><div class="lv"><div class="bar"><i style="width:${lvl().p*100}%"></i></div></div><div class="week">${weekDots()}</div></section>
+ <button class="big" onclick="startAll()" ${tot?"":"disabled"}>${dc?`Jetzt lernen · ${dc} fällig`:tot?"Alles geschafft 🎉 Trotzdem üben":"Starte mit einem Foto"}</button>
+ <div class="row" onclick="go('stats')"><span class="em">📊</span><div class="grow"><b>Statistik und Abzeichen</b></div><span class="chev">›</span></div><h3>Fächer</h3>${S.decks.length?S.decks.map(deckRow).join(""):'<div class="card sub">Noch nichts da. Tippe auf das Plus, fotografiere eine Vokabelseite und leg los.</div>'}
+ <button class="fab" onclick="go('add')" aria-label="Neue Karten">＋</button>`}
+function deckRow(d){const n=d.cards.length,k=d.cards.filter(c=>c.box>=4).length,u=d.cards.filter(due).length;
+ return `<div class="row" onclick="go('deck','${d.id}')"><span class="em">${d.e}</span><div class="grow"><b>${esc(d.n)}</b><div class="bar"><i style="width:${n?k/n*100:0}%"></i></div></div><span class="sub">${u?u+" fällig":n+" Karten"}</span><span class="chev">›</span></div>`}
+
+function vDeck(){
+ const d=S.decks.find(x=>x.id==A);if(!d){V="home";return vHome()}
+ return `<nav><button class="lnk" onclick="go('home')">‹ Zurück</button></nav><h1>${d.e} ${esc(d.n)}</h1>
+ <button class="big" onclick="startDeck('${d.id}')">Lernen · ${d.cards.length} Karten</button>
+ <div class="btns" style="margin:0 0 14px"><button class="ghost" onclick="go('add','${esc(d.n).replace(/'/g,"&#39;")}')">📷 Foto hinzufügen</button><button class="ghost" style="color:var(--red)" onclick="delDeck('${d.id}')">${X==d.id?"Wirklich löschen?":"Fach löschen"}</button></div>
+ ${d.cards.map(c=>`<div class="row" style="cursor:default"><div class="grow"><b>${esc(c.f)}</b><div class="sub">${esc(c.b)}</div></div><span class="sub">${c.box}/6</span><button class="x" onclick="delCard('${d.id}','${c.id}')" aria-label="Löschen">✕</button></div>`).join("")}`}
+function delDeck(id){if(X==id){S.decks=S.decks.filter(d=>d.id!=id);Store.save();go('home')}else{X=id;render()}}
+function delCard(d,c){const k=S.decks.find(x=>x.id==d);k.cards=k.cards.filter(x=>x.id!=c);Store.save();render()}
+
+function vAdd(){
+ return `<nav><button class="lnk" onclick="go('home')">‹ Zurück</button></nav><h1>Neue Karten</h1>
+ <div class="card"><label class="sub">Fach</label><input id="dn" class="in" list="dl" placeholder="z. B. Englisch Unit 3" value="${esc(A||"")}"><datalist id="dl">${S.decks.map(d=>`<option value="${esc(d.n)}">`).join("")}</datalist></div>
+ ${BUSY?'<div class="card center"><div class="spin"></div><p>Claude liest dein Heft …</p></div>':'<label class="big file">📷 Foto aufnehmen oder auswählen<input type="file" accept="image/*" hidden onchange="pick(this.files[0])"></label><button class="ghost" style="width:100%" onclick="manual()">Ohne Foto eintippen</button>'}
+ ${ERR?`<p class="err">${esc(ERR)}</p><button class="lnk" onclick="perms()">🔑 Klassen-Code eingeben</button>`:""}`}
+async function shrink(f){const b=await createImageBitmap(f),k=Math.min(1,1600/Math.max(b.width,b.height)),c=document.createElement("canvas");c.width=b.width*k;c.height=b.height*k;c.getContext("2d").drawImage(b,0,0,c.width,c.height);return new Promise(r=>c.toBlob(r,"image/jpeg",.85))}
+async function pick(f){
+ if(!f)return;const dn=$("#dn").value.trim();BUSY=true;ERR="";A=dn;render();
+ try{let code=localStorage.getItem("cc");if(!code){code=prompt("Klassen-Code eingeben");if(!code)throw 0;localStorage.setItem("cc",code)}
+  const blob=await shrink(f),img=await new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(",")[1]);x.readAsDataURL(blob)});
+  const res=await fetch("/.netlify/functions/extract",{method:"POST",body:JSON.stringify({image:img,code})});
+  if(res.status==401){localStorage.removeItem("cc");throw 2}if(!res.ok)throw 0;
+  const m=(await res.text()).match(/\[[\s\S]*\]/),rows=JSON.parse(m[0]).filter(r=>r&&r.f&&r.b).map(r=>({f:String(r.f),b:String(r.b)}));if(!rows.length)throw 1;
+  R={dn,rows};BUSY=false;go('review')}
+ catch(e){BUSY=false;ERR=e===1?"Ich konnte keine Vokabeln erkennen. Fotografiere näher und gerade, oder tippe sie ein.":e===2?"Der Klassen-Code stimmt nicht.":"Die Foto-Erkennung klappt gerade nicht. Du kannst die Karten auch eintippen.";render()}}
+function manual(){R={dn:$("#dn").value.trim(),rows:[{f:"",b:""},{f:"",b:""},{f:"",b:""}]};go('review')}
+
+function vReview(){
+ const n=R.rows.filter(r=>r.f.trim()&&r.b.trim()).length;
+ return `<nav><button class="lnk" onclick="go('add',R.dn)">‹ Zurück</button></nav><h1>Prüfen</h1><p class="sub" style="margin:-6px 4px 12px">Die Erkennung kann Fehler machen. Korrigiere, was nicht stimmt.</p>
+ <div class="card"><label class="sub">Fach</label><input class="in" value="${esc(R.dn)}" placeholder="Fach" oninput="R.dn=this.value"></div>
+ ${R.rows.map((r,i)=>`<div class="mini" style="margin-bottom:8px"><input class="in" style="background:var(--card)" value="${esc(r.f)}" placeholder="Vokabel" oninput="R.rows[${i}].f=this.value"><input class="in" style="background:var(--card)" value="${esc(r.b)}" placeholder="Deutsch" oninput="R.rows[${i}].b=this.value"><button class="x" onclick="R.rows.splice(${i},1);render()">✕</button></div>`).join("")}
+ <button class="lnk" onclick="R.rows.push({f:'',b:''});render()">＋ Zeile hinzufügen</button>
+ <button class="big" onclick="saveCards()" ${n?"":"disabled"}>${n} Karten speichern</button>`}
+function saveCards(){
+ const rows=R.rows.filter(r=>r.f.trim()&&r.b.trim());if(!rows.length)return;const n=(R.dn||"").trim()||"Mein Fach";
+ let d=S.decks.find(x=>x.n.toLowerCase()==n.toLowerCase());if(!d){d={id:uid(),n,e:EMO[S.decks.length%EMO.length],cards:[]};S.decks.push(d)}
+ const have=new Set(d.cards.map(c=>c.f.toLowerCase()+"|"+c.b.toLowerCase()));
+ rows.forEach(r=>{const k=r.f.trim().toLowerCase()+"|"+r.b.trim().toLowerCase();if(!have.has(k)){have.add(k);d.cards.push({id:uid(),f:r.f.trim(),b:r.b.trim(),box:0,due:today()})}});
+ Store.save();R=null;go('deck',d.id)}
+
+function start(items){if(!items.length)return;
+ L={q:shuf(items).slice(0,15).map(x=>({...x})),i:0,ok:0,tot:0,res:[],combo:0,xp:0,h:0,t:"",st:"ask",fb:null,swap:false};go('learn')}
+function startAll(){const d=dueAll();start(d.length?d:allOf(S.decks))}
+function startDeck(id){const k=S.decks.find(x=>x.id==id),d=k.cards.filter(due).map(c=>({d:id,c}));start(d.length?d:allOf([k]))}
+const Q=()=>{const it=L.q[L.i],c=it.c;return{it,c,q:L.swap?c.b:c.f,a:L.swap?c.f:c.b}};
+function hintText(a,h){return [...a.split(/[;\/]/)[0].trim()].map((ch,i)=>i<h?ch:ch==" "?" ":"•").join("")}
+function vLearn(){
+ const{it,q,a}=Q(),ask=L.st=="ask";
+ return `<nav><button class="lnk" onclick="L=null;go('home')">✕</button><div class="bar grow"><i style="width:${L.i/L.q.length*100}%"></i></div><button class="lnk" onclick="L.swap=!L.swap;L.t='';render()" aria-label="Richtung tauschen">⇄</button></nav>
+ ${L.combo>1?`<div class="combo">🔥 ${L.combo} in Folge</div>`:""}
+ <div class="qcard ${ask?"":L.fb.ok?"good":"bad"}"><p class="sub">${esc(deckName(it.d))}${it.r?" · Wiederholung":""}</p><h2>${esc(q)}</h2>
+ ${ask&&L.h?`<p class="hint">${esc(hintText(a,L.h))}</p>`:""}
+ ${ask?`<input id="ans" class="in" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Deine Antwort" onkeydown="if(event.key=='Enter')check()">
+ <div class="btns"><button class="ghost" onclick="hint()">💡 Hinweis</button><button class="ghost" onclick="settle(false,'Aufgelöst:')">Auflösen</button></div><button class="big" onclick="check()">Prüfen</button>`
+ :`<p class="fbk">${esc(L.fb.msg)}</p><p class="ans">${esc(a)}</p><button class="big" onclick="next()">Weiter</button>`}</div>`}
+function hint(){const{a}=Q(),n=a.split(/[;\/]/)[0].trim().length;L.t=$("#ans").value;if(L.h<n)L.h++;render()}
+function check(){
+ const{a}=Q(),v=$("#ans").value;if(!v.trim())return;
+ const alts=a.split(/[;\/]/).map(norm).filter(Boolean),n=norm(v);
+ if(alts.includes(n))settle(true,L.h?"Richtig, mit Hinweis":["Richtig!","Stark!","Genau!","Perfekt!"][L.combo%4]);
+ else if(alts.some(x=>x.length>=5&&lev(x,n)<=1))settle(true,"Fast, nur ein kleiner Tippfehler. Zählt!");
+ else settle(false,"Leider falsch. Richtig ist:")}
+function settle(ok,msg){
+ const{it,c}=Q(),hint=L.h>0;let gain=0;
+ if(!it.r){L.tot++;S.acc=S.acc||{ok:0,tot:0};S.acc.tot++;if(ok)S.acc.ok++;const t=today();S.days[t]=(S.days[t]||0)+1;
+  if(S.last!=t){S.streak=(S.last==addDays(-1)?S.streak:0)+1;S.last=t}
+  if(ok){L.ok++;if(!hint){c.box=Math.min(c.box+1,6);gain=10+Math.min(L.combo,5)*2;L.combo++}else gain=5;c.due=addDays(IV[c.box])}
+  else{c.box=0;c.due=today();L.combo=0;L.res.push({d:it.d,c});L.q.push({d:it.d,c,r:true})}}
+ else if(ok)gain=2;
+ L.xp+=gain;const l0=lvl().n;S.xp+=gain;if(lvl().n>l0){toast("🆙 Level "+lvl().n+"!","20%");pop(30)}L.st="fb";L.fb={ok,msg};Store.save();
+ if(ok){pop(6);buzz(15);if(gain)toast("+"+gain+" XP")}else buzz([30,40,30]);render()}
+function next(){L.i++;L.h=0;L.t="";L.st="ask";if(L.i>=L.q.length){S.xp+=20;L.xp+=20;if(L.tot>=5&&L.ok==L.tot)S.perf=(S.perf||0)+1;Store.save();go('done');if(L.ok/Math.max(L.tot,1)>=.8)setTimeout(()=>pop(36),300)}else render()}
+addEventListener("keydown",e=>{if(e.key=="Enter"&&V=="learn"&&L&&L.st=="fb"&&e.target.tagName!="BUTTON")next()});
+
+function vDone(){
+ const p=L.tot?L.ok/L.tot:0,w=L.res.length;
+ return `<h1 style="text-align:center;margin-top:20px">${p>=.8?"Stark gemacht!":p>=.5?"Gut dran!":"Dranbleiben!"}</h1>
+ <div class="score">${ring(p,150,14)}<b>${Math.round(p*100)}%</b></div>
+ <p style="text-align:center">${L.ok} von ${L.tot} richtig</p><p class="sub" style="text-align:center;margin-top:4px">+${L.xp} XP · 🔥 ${streak()} Tage in Folge</p>
+ ${w?`<h3>Zum Nachlernen</h3>${L.res.map(r=>`<div class="row" style="cursor:default"><div class="grow"><b>${esc(r.c.f)}</b><div class="sub">${esc(r.c.b)}</div></div></div>`).join("")}<button class="big" onclick="start(L.res)">Fehler nochmal üben</button>`:""}
+ <button class="${w?"ghost":"big"}" style="${w?"width:100%":""}" onclick="L=null;go('home')">Fertig</button>`}
+
+const lvl=()=>{const x=S.xp||0,n=Math.floor(Math.sqrt(x/40))+1,a=40*(n-1)**2,b=40*n**2;return{n,p:(x-a)/(b-a)}};
+const dayName=k=>new Date(k+"T12:00").toLocaleDateString("de",{weekday:"short"}).slice(0,2);
+const weekDots=()=>[6,5,4,3,2,1,0].map(n=>{const k=addDays(-n),on=(S.days[k]||0)>0;return `<span><i class="${on?"on":""}">${on?"✓":""}</i>${dayName(k)}</span>`}).join("");
+function toast(t,top){const s=document.createElement("div");s.className="xp";if(top)s.style.top=top;s.textContent=t;document.body.appendChild(s);setTimeout(()=>s.remove(),1400)}
+function perms(){const c=prompt("Klassen-Code eingeben");if(c){localStorage.setItem("cc",c);ERR="";render()}}
+function vStats(){
+ const cs=allOf(S.decks),m=cs.filter(x=>x.c.box>=4).length,a=S.acc||{ok:0,tot:0},days=[6,5,4,3,2,1,0].map(addDays),mx=Math.max(GOAL,...days.map(k=>S.days[k]||0)),l=lvl();
+ const B=[["🔥","3 Tage Streak",streak()>=3],["🌟","7 Tage Streak",streak()>=7],["📚","25 Karten",cs.length>=25],["🧠","10 gemeistert",m>=10],["🎯","Perfekte Runde",(S.perf||0)>0],["⚡","500 XP",S.xp>=500],["🏆","Level 5",l.n>=5],["💪","100 Antworten",a.tot>=100]];
+ return `<nav><button class="lnk" onclick="go('home')">‹ Zurück</button></nav><h1>Statistik</h1>
+ <div class="card"><div style="display:flex;justify-content:space-between"><b>Level ${l.n}</b><span class="sub">${S.xp} XP</span></div><div class="bar" style="height:10px"><i style="width:${l.p*100}%"></i></div></div>
+ <div class="grid3"><div class="stat"><b>${cs.length}</b>Karten</div><div class="stat"><b>${m}</b>Gemeistert</div><div class="stat"><b>${a.tot?Math.round(a.ok/a.tot*100):0}%</b>Treffer</div></div>
+ <div class="card"><b>Letzte 7 Tage</b><div class="bars" style="margin-top:12px">${days.map(k=>{const v=S.days[k]||0;return `<div><span>${v||""}</span><i style="height:${Math.max(5,v/mx*85)}px"></i>${dayName(k)}</div>`}).join("")}</div></div>
+ <h3>Abzeichen</h3><div class="badges">${B.map(b=>`<div class="bd ${b[2]?"":"off"}"><span>${b[0]}</span>${b[1]}</div>`).join("")}</div>
+ <button class="ghost" style="width:100%;margin-top:18px" onclick="perms()">🔑 Klassen-Code ändern</button>`}
+render();Store.load().then(()=>{ready=true;render()});
+</script></body></html>
